@@ -112,7 +112,7 @@
             country={USA}}
 
 \author[inst1]{Drew Brittin}
-\author[inst1]{Praveen Jayasuriya}
+\author[inst1]{Praveen Jayasuriya Daluwathumullagamage}
 \author[inst1]{Anthony Petrilla}
 \author[inst1]{Margret Pugh}
 \author[inst1]{Shahabuddin Alam}
@@ -200,6 +200,9 @@ A few-hundred fold enhancement is evident from the fact that the signal-per-pixe
 \par The ideal magnetic field strength for SABRE j-scalar coupling network to transfer polarization is roughly between $\sim$6-8mT. The next set of experiments involved bubbling pH$_{\mathrm{2}}$ just outside the headcoil (measured at 65G) for 30 seconds and imaged using the scanner (64mT) using a spin density map. The acquisition time for the experiment was 15s with a resolution of 1x1x3.5 mm\textsuperscript{3}. 
 
 \section{Methods}
+
+\subsection{Quantity Signal Generation}
+
 All experiments were conducted by bubbling para-hydrogen gas through a solution of 100 mM substrate, pyrazine (py) and nicotinamide (nico) , in CD$_{\mathrm{3}}$OD with 5.7 mM
 Ir(IMes)(COD)Cl as catalyst for SABRE in a shortened 5 mm NMR tube placed vertically within the scanner’s head coil. 
 \begin{figure}
@@ -210,14 +213,25 @@ Ir(IMes)(COD)Cl as catalyst for SABRE in a shortened 5 mm NMR tube placed vertic
 \end{figure}
 
 The SABRE catalyst was activated for 20 min by continuously bubbling pH$_{\mathrm{2}}$ into the sample at 90sccm. Once activated, a multichannel nanalysis benchtop 60 MHz NMR spectrometer was used to perform a single scan SABRE-enhanced 1H NMR spectroscopy experiment. The parameters for SABRE were optimized for pyrazine and nicotinamide and following its confirmation, samples were transferred to the 64mT Hyperfine MRI scanner. 
-A fast spin echo (FSE) which took 5 min at 20sccm in continuous bubbling and a spin density map were used to obtain SABRE-enhanced images with different parameters. To quantify signal, falcon tube samples containing fractions of H$_{\mathrm{2}}$O/D$_{\mathrm{2}}$O (100\%, 90\%, 75\%, 50\%, 25\%, 10\% and 0\%) were used along with the SABRE tube. \par The obtained images were processed using openCV\cite{opencv_library} (a python package) and matlab to acquire enhancement.
+A fast spin echo (FSE) which took 5 min at 20sccm in continuous bubbling and a spin density map were used to obtain SABRE-enhanced images with different parameters. To quantify signal, falcon tube samples containing fractions of H$_{\mathrm{2}}$O/D$_{\mathrm{2}}$O (100\%, 90\%, 75\%, 50\%, 25\%, 10\% and 0\%) were used along with the SABRE tube.
 
 \subsection{Image Processing}
 
 The Hpyerfine  MRI scanner processes the raw quantity signals to \texttt{.dcm} (DICOM) images using a proprietary data reduction pipeline which was not exposed to the researchers. These files can be viewed and exported to a local drive via a proprietary web application. This web application does not posses the capabilities to further process the DICOM images. For the purpose of this work, these images were exported from the web application to a local drive and processed by a image processing pipeline developed by the researchers. 
 
-\texttt{.OpenCV} 
+The Python language version of \texttt{.OpenCV} was used for this image processing pipeline \cite{opencv_library}. \texttt{.Pydicom} \cite{mason2011t} was used for DICOM image conversion to Python arrays. Additionally, libraries such as \texttt{.matplotlib} was used for plotting intermediate and final results. 
 
+The exported DICOM file from the web application contained multiple coronal views of the tubes with varying levels of image intensity. The view with the maximum total image intensity was selected from this list of views. The portion of the image containing the tubes was isolated to a 70x50 pixel region. The region of the image outside this isolated pixel region did not contain useful information regarding the tubes and was thus discarded.
+
+ADD RAW IMAGE HERE
+
+The raw image data which comprised 0 to 40,000 grayscale values was normalised to 256 levels. Image threshholding was used to develop a binary mask of the test tubes. This mask was then used to isolate the contours of each test tube in the chosen coronal view. These contours were approximately circular. Deviations from the circular shape were due to local variations in concentration across the coronal view of test tube resulting in image artefacts (noise). 
+
+ADD NORMALISED IMAGE HERE
+
+Not all test tubes were isolated using a single binary mask. The broad range of gray values resulted in a significantly different threshold for masking the tubes with the highest intensities compared to a single tube with the lowest image intensity. Thus a second mask was used to isolate the tube with the lowest image intensity.
+
+ADD BINARY MASK HERE 
 
 The coronal view of the tubes were used to plot colour maps using matplotlib. The plotted maps were then used to normalize to a 256 pixel array. The normalized data was averaged by isolating pixel under each isolated area and pixel values between a minimum and maximum value was used to threshold. Then the obtained average signal was plotted against the concentration of 1H to obtain a calibration curve. 
 The calibration curve was then used to quantify polarization enhancement. 
